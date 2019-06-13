@@ -32,7 +32,27 @@
   }
 }
 
+.global-container {
+  padding: 2rem;
+}
+
+.items-container {
+  margin-top:2rem;
+  margin-bottom: 2rem;
+  width:100%;
+}
+
 .card {
-  width: 18rem;
+  width:100%;
+}
+
+.card-header {
+  width: 12.5rem;
+  height: 12.5rem;
+}
+
+.card-header img {
+  max-width: 10rem;
+  max-height: 10rem;
 }
 

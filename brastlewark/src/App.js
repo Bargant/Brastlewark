@@ -54,9 +54,9 @@ class App extends Component{
     );
 
     return (
-      <div>
-        <input type='text' name='filter' onChange={this.handleFilterChange.bind(this)}/>
-        <div class="col-sm-6 col-md-4 col-lg-3 mt-4">{items}</div>
+      <div className='global-container'>
+        <div className='filter-container'><input type='text' name='filter' className='form-control' onChange={this.handleFilterChange.bind(this)}/></div>
+        <div className='items-container' >{items}</div>
       </div>
     );
   }
