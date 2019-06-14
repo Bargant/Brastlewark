@@ -15,10 +15,11 @@ react-paginate
 # Installation
 
 You can run it locally using:
-'''
+
+```
 $ npm install
 $ npm run start
-'''
+```
 
 # Possible improvements
 
