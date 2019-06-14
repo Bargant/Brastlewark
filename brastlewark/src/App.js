@@ -1,5 +1,6 @@
 import React, { Component }  from 'react';
 import InputRange from 'react-input-range';
+import ReactPaginate from 'react-paginate';
 //import { ListGroup, Bootstrap, Grid, Row, Col } from 'react-bootstrap';
 import Gnome from './Components/Gnome'
 
@@ -7,6 +8,11 @@ import 'bootstrap/dist/css/bootstrap.css';
 import "react-input-range/lib/css/index.css"
 
 import './App.css';
+
+const SHOWFILTERTXT = 'Show advanced filters';
+const HIDEFILTERTXT = 'Hide advanced filters';
+const SERVICEURL = 'https://raw.githubusercontent.com/rrafols/mobile_test/master/data.json';
+const ITEMSPERPAGE = 10;
 
 class App extends Component{
 
@@ -23,17 +29,22 @@ class App extends Component{
       filterName: true,
       filterHair: false,
       filterProfession: false,
-      filterFriends: false
+      filterFriends: false,
+      showFilters: false,
+      showFilterText: SHOWFILTERTXT,
+      pageCount: 0,
+      offset: 0
     };
   }
 
   componentWillMount() {
-    fetch('https://raw.githubusercontent.com/rrafols/mobile_test/master/data.json')
+    fetch(SERVICEURL)
       .then(response => response.json())
       .then(data => {
         this.setState({ 
           originalData: Object.values(data.Brastlewark),
-          filteredData: Object.values(data.Brastlewark)
+          filteredData: Object.values(data.Brastlewark).slice(this.state.offset, this.state.offset + ITEMSPERPAGE),
+          pageCount: Object.values(data.Brastlewark).length / ITEMSPERPAGE,
         });
       });
   }
@@ -46,7 +57,7 @@ class App extends Component{
 
   handleInputChange(event) {
     const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.type === 'checkbox' ? target.checked : target.value.toLowerCase();
     const name = target.name;
 
     this.setState({
@@ -54,9 +65,11 @@ class App extends Component{
     });
   }
 
-
-
   handleFilterClick(event) {
+    this.updateList(0);
+  }
+
+  updateList(offset) {
     var result = this.state.originalData.filter(gnome => {
       return (
            (gnome.age >= this.state.ageRange.min && gnome.age <= this.state.ageRange.max)
@@ -66,15 +79,45 @@ class App extends Component{
           || (this.state.filterName && gnome.name.toLowerCase().indexOf(this.state.filterText) >= 0)
           || (this.state.filterHair && gnome.hair_color.toLowerCase().indexOf(this.state.filterText) >= 0)
           || (this.state.filterProfession && gnome.professions.some(r=> r.toLowerCase().indexOf(this.state.filterText) >= 0))
-          //|| (this.state.filterName && gnome.name.toLowerCase().indexOf(this.state.filterText) >= 0)
+          || (this.state.filterFriends && gnome.friends.some(r=> r.toLowerCase().indexOf(this.state.filterText) >= 0))
         )
       );
     })
 
     this.setState({ 
-      filteredData: result
+      filteredData: result.slice(offset, offset + ITEMSPERPAGE),
+      pageCount: result.length / ITEMSPERPAGE,
+      offset: offset
     });
-}
+  }
+
+  handleClickShowFilters() {
+    if (this.state.showFilters) {
+      this.setState({ 
+        showFilters: false,
+        showFilterText: SHOWFILTERTXT
+      });
+    }
+    else {
+      this.setState({ 
+        showFilters: true,
+        showFilterText: HIDEFILTERTXT
+      });
+    }
+  }
+
+  handlePageClick = data => {
+    let selected = data.selected;
+    let offset = Math.ceil(selected * ITEMSPERPAGE);
+
+    this.updateList(offset);
+  };
+
+  searchKeyPressed(event){
+    if (event.key === "Enter") {
+      this.handleFilterClick(event);
+    }
+  }
 
   render(){
     const items = this.state.filteredData.map((item, key) =>
@@ -83,8 +126,12 @@ class App extends Component{
 
     return (
       <div className='global-container'>
-        <div className='filter-container'>
-          <input type='text' name='filterText' className='form-control filter-text' onChange={this.handleInputChange.bind(this)}/>
+        <h1>Brastlewark census</h1>
+        <input type='text' name='filterText' className='form-control filter-text' placeholder="Search"
+        onChange={this.handleInputChange.bind(this)} onKeyPress={this.searchKeyPressed.bind(this)}/>
+        
+        <div className='show-filters btn btn-link text-decoration-none' onClick={this.handleClickShowFilters.bind(this)}>{this.state.showFilterText}</div>
+        {this.state.showFilters && <div className='filter-container'>
           
           <h5 className='filter-header'>Search by:</h5>
 
@@ -143,11 +190,29 @@ class App extends Component{
               value={this.state.weightRange}
               onChange={value => this.setState({ weightRange: value })} />
           </div>
-
-          <button type="button" className="btn btn-primary filter-button" onClick={this.handleFilterClick.bind(this)}>Search</button>
-
-        </div>
+        </div>}
+        <button type="button" className="btn btn-primary filter-button" onClick={this.handleFilterClick.bind(this)}>Search</button>
+        
+        {this.state.filteredData.length>0 &&
         <div className='items-container' >{items}</div>
+         }
+         {this.state.filteredData.length==0 &&
+          <div className='items-container' >No results found</div>
+         }
+        <ReactPaginate
+          className='paginator'
+          previousLabel={'previous'}
+          nextLabel={'next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={this.state.pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={this.handlePageClick}
+          containerClassName={'pagination'}
+          subContainerClassName={'pages pagination'}
+          activeClassName={'active'}
+        />
       </div>
     );
   }
