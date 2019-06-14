@@ -2,9 +2,6 @@ import React, { Component }  from 'react';
 import '../App.css';
 
 class Gnome extends Component {
-    constructor(props) {
-        super(props);
-    }
    
     render() {
         const professions = this.props.data.professions.join(", ");

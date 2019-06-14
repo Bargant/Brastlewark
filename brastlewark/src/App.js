@@ -196,11 +196,10 @@ class App extends Component{
         {this.state.filteredData.length>0 &&
         <div className='items-container' >{items}</div>
          }
-         {this.state.filteredData.length==0 &&
+         {this.state.filteredData.length === 0 &&
           <div className='items-container' >No results found</div>
          }
         <ReactPaginate
-          className='paginator'
           previousLabel={'previous'}
           nextLabel={'next'}
           breakLabel={'...'}
