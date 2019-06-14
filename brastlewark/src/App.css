@@ -42,6 +42,34 @@
   width:100%;
 }
 
+.filter-header {
+  margin-top: 2rem;
+}
+
+.filter-container .form-check {
+  margin-left: 2rem;
+}
+
+.filter-text { 
+  width: 100rem;
+}
+
+.filter-range {
+  max-width: 50rem;
+  margin:2rem;
+}
+
+.filter-range label {
+  margin-bottom: 1rem;
+}
+
+.filter-button {
+  width: 5rem;
+  float:right;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
 .card {
   width:100%;
 }
